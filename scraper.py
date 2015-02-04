@@ -15,12 +15,12 @@ class Scraper(object):
                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def rank_by_reviews(self, books):
-        pass
+        newlist = sorted(books, key=lambda k: k['rating'], reverse=True) 
+        return newlist
 
     def get_amazon_reviews(self, books):
         for b in books:
-#            url = AMAZON_URL + b['isbn10']
-            url = AMAZON_URL + '0764555871'
+            url = AMAZON_URL + b['isbn10']
 
             self.br.open(url)
 
@@ -31,7 +31,26 @@ class Scraper(object):
 
             b['rating'] = f
 
-    def isbn13to10(self, isbn10):
+    def isbn10_check_digit(self, isbn10):
+        i = 0
+        s = 0
+
+        for n in xrange(10,1,-1):
+            s += n * int(isbn10[i])
+            i += 1
+
+        s = s % 11
+        s = s % 11
+        v = 11 - s
+        
+        if v == 10:
+            return 'x'
+        else:
+            return str(v)
+
+    def isbn13to10(self, isbn13):
+        first9 = isbn13[3:][:9]
+        isbn10 = first9 + self.isbn10_check_digit(first9)
         return isbn10
 
     def search_library_books(self, q):
@@ -57,7 +76,7 @@ class Scraper(object):
             book = {}
             book['title'] = d.a['title']
             book['isbn13'] = i['value']
-            book['isbn10'] = self.isbn13to10(book['isbn10'])
+            book['isbn10'] = self.isbn13to10(book['isbn13'])
             books.append(book)
 
         return books
@@ -65,7 +84,10 @@ class Scraper(object):
     def scrape(self, q='javascript'):
         books = self.search_library_books(q=q)
         self.get_amazon_reviews(books)
-        self.rank_by_reviews(books)
+        books = self.rank_by_reviews(books)
+
+        for b in books:
+            print b['rating'], b['title']
 
 if __name__ == '__main__':
     scraper = Scraper()
