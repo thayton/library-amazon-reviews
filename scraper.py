@@ -6,7 +6,6 @@ import mechanize
 from bs4 import BeautifulSoup
 
 AMAZON_URL = 'http://www.amazon.com/gp/product/'
-LIBRARY_URL = 'https://mdpl.ent.sirsi.net/client/catalog/search/advanced?'
 
 class Scraper(object):
     def __init__(self):
@@ -117,8 +116,8 @@ class Scraper(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Search Sirsi catalogue. Return results ranked by Amazon rating.")
-    parser.add_argument("-u", "--url",   help="Sirsi url", required=True)
-    parser.add_argument("-q", "--query", help="Query string", required=True)
+    parser.add_argument("-u", "--url",   help="Url", required=True)
+    parser.add_argument("-q", "--query", help="Query", required=True)
     args = parser.parse_args()
 
     scraper = Scraper()
